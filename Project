@@ -21,8 +21,8 @@ void PortN_Init(void){
 	SYSCTL_RCGCGPIO_R |= SYSCTL_RCGCGPIO_R12;             // turn ON clock for Port M
 	while((SYSCTL_PRGPIO_R & SYSCTL_PRGPIO_R12) == 0){};  // wait until Port M is ready
 
-	GPIO_PORTM_DIR_R |= 0b00000011;                        // set PN0-PN1 direction =1 (INPUT) (PM0-PM3 are used)
-  GPIO_PORTM_DEN_R |= 0b00000011;												// digital enable 	
+	GPIO_PORTN_DIR_R |= 0b00000011;                        // set PN0-PN1 direction =1 (INPUT) (PM0-PM3 are used)
+  GPIO_PORTN_DEN_R |= 0b00000011;												// digital enable 	
 												
 	                        
 	return;                                               // exit function
@@ -32,8 +32,8 @@ void PortF_Init(void){
 	SYSCTL_RCGCGPIO_R |= SYSCTL_RCGCGPIO_R5;             // turn ON clock for Port M
 	while((SYSCTL_PRGPIO_R & SYSCTL_PRGPIO_R5) == 0){};  // wait until Port M is ready
 
-	GPIO_PORTM_DIR_R |= 0b00011111;                        // set PM0-PM7 direction = 0 (INPUT) (PM0-PM3 are used)
-  GPIO_PORTM_DEN_R |= 0b00011111;												// digital enable 	
+	GPIO_PORTF_DIR_R |= 0b00011111;                        // set PM0-PM7 direction = 0 (INPUT) (PM0-PM3 are used)
+  GPIO_PORTF_DEN_R |= 0b00011111;												// digital enable 	
 												
 	                        
 	return;                                               // exit function
@@ -42,8 +42,8 @@ void PortJ_Init(void){
 	SYSCTL_RCGCGPIO_R |= SYSCTL_RCGCGPIO_R8;             // turn ON clock for Port M
 	while((SYSCTL_PRGPIO_R & SYSCTL_PRGPIO_R8) == 0){};  // wait until Port M is ready
 
-	GPIO_PORTM_DIR_R &= 0b11111100;                        // set PM0-PM7 direction = 0 (INPUT) (PM0-PM3 are used)
-  GPIO_PORTM_DEN_R |= 0b00000011;												// digital enable 	
+	GPIO_PORTJ_DIR_R &= 0b11111100;                        // set PM0-PM7 direction = 0 (INPUT) (PM0-PM3 are used)
+  GPIO_PORTJ_DEN_R |= 0b00000011;												// digital enable 	
 												
 	                        
 	return;                                               // exit function
@@ -53,8 +53,8 @@ void PortH_Init(void){
 	SYSCTL_RCGCGPIO_R |= SYSCTL_RCGCGPIO_R4;             // turn ON clock for Port M
 	while((SYSCTL_PRGPIO_R & SYSCTL_PRGPIO_R4) == 0){};  // wait until Port M is ready
 
-	GPIO_PORTM_DIR_R |= 0b00001111;                        // set PM0-PM7 direction = 0 (INPUT) (PM0-PM3 are used)
-  GPIO_PORTM_DEN_R |= 0b00001111;												// digital enable 	
+	GPIO_PORTH_DIR_R |= 0b00001111;                        // set PH0-PH7 direction = 0 (INPUT) (PM0-PM3 are used)
+  GPIO_PORTH_DEN_R |= 0b00001111;												// digital enable 	
 												
 	                        
 	return;                                               // exit function

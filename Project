@@ -13,7 +13,7 @@ void PortM_Init(void){
 
 	GPIO_PORTM_DIR_R &= 0b11111100;                        // set PM0-PM1 direction = 0 (INPUT) (PM0-PM3 are used)
   GPIO_PORTM_DEN_R |= 0b00000011;												// digital enable 	
-												
+	GPIO_PORTM_PDR_R = 0b00000011;											//Internal Pull down resistor  
 	                        
 	return;                                               // exit function
 }
@@ -44,14 +44,14 @@ void PortJ_Init(void){
 
 	GPIO_PORTJ_DIR_R &= 0b11111100;                        // set PM0-PM7 direction = 0 (INPUT) (PM0-PM3 are used)
   GPIO_PORTJ_DEN_R |= 0b00000011;												// digital enable 	
-												
+	GPIO_PORTJ_PDR_R = 0b00000011;											
 	                        
 	return;                                               // exit function
 }
 
 void PortH_Init(void){
-	SYSCTL_RCGCGPIO_R |= SYSCTL_RCGCGPIO_R4;             // turn ON clock for Port M
-	while((SYSCTL_PRGPIO_R & SYSCTL_PRGPIO_R4) == 0){};  // wait until Port M is ready
+	SYSCTL_RCGCGPIO_R |= SYSCTL_RCGCGPIO_R7;             // turn ON clock for Port M
+	while((SYSCTL_PRGPIO_R & SYSCTL_PRGPIO_R7) == 0){};  // wait until Port M is ready
 
 	GPIO_PORTH_DIR_R |= 0b00001111;                        // set PH0-PH7 direction = 0 (INPUT) (PM0-PM3 are used)
   GPIO_PORTH_DEN_R |= 0b00001111;												// digital enable 	
@@ -59,3 +59,21 @@ void PortH_Init(void){
 	                        
 	return;                                               // exit function
 }
+
+void spin(){
+	int i;
+	uint32_t delay=1;
+	for (i=0;i<512;i++){	// full step is 512, half step is 256
+		GPIO_PORTH_DATA_R=0b00000011;// counter clockwise so magnets are switching
+		SysTick_Wait10ms(delay);
+		GPIO_PORTH_DATA_R=0b00000110;
+		SysTick_Wait10ms(delay);
+		GPIO_PORTH_DATA_R=0b00001100;
+		SysTick_Wait10ms(delay);
+		GPIO_PORTH_DATA_R=0b0001001;
+		SysTick_Wait10ms(delay);
+	}
+	return;
+}
+
+

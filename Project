@@ -13,9 +13,9 @@ int clockWise = 1;         // 1 = CW, 0 = CCW
 int Angle11 = 1;           // 1 = 11.25 degree mode, 0 = 45 degree mode
 
 int fullSeqIndex = 0;          // stepper sequence index: 0 to 3
-int halfSeqIndex = 0;
 int stepCount = 0;         // counts steps during one run
 int currentPosition = 0;   // tracks shaft position from 0 to 31
+int homePosition=0;				//saved home position
 void PortM_Init(void){
 	SYSCTL_RCGCGPIO_R |= SYSCTL_RCGCGPIO_R11;             // turn ON clock for Port M
 	while((SYSCTL_PRGPIO_R & SYSCTL_PRGPIO_R11) == 0){};  // wait until Port M is ready
@@ -90,7 +90,7 @@ void MotorOff(void){
 // this method is used where it doesnt have to loop 512 times. this can be interrupted and does not have to finish
 void FullStepMotor(void){
 	if(clockWise == 1){
-		if(fullSeqIndex == 0) GPIO_PORTH_DATA_R = 0b00000011;
+		if(fullSeqIndex == 0) GPIO_PORTH_DATA_R = 0b00000011; //moves the rotor full step angle, 2 coils on
 		if(fullSeqIndex == 1) GPIO_PORTH_DATA_R = 0b00000110;
 		if(fullSeqIndex == 2) GPIO_PORTH_DATA_R = 0b00001100;
 		if(fullSeqIndex == 3) GPIO_PORTH_DATA_R = 0b00001001;
@@ -127,13 +127,12 @@ void UpdateLEDs(void)
 	else
 		GPIO_PORTN_DATA_R &= 0b11111101;
 	// LED1 on PN0: clockwise
-	if(clockWise == 1)
+	if(clockWise == 1&&MotorRunning==1)
 		GPIO_PORTN_DATA_R |= 0b00000001;
 	else
 		GPIO_PORTN_DATA_R &= 0b11111110;
 	// LED2 on PF4: 11.25 degree mode
-	// spec says if motor is off, LED2 should be off
-	if((MotorRunning == 1) && (Angle11 == 1))
+	if (Angle11 == 1&&MotorRunning==1)
 		GPIO_PORTF_DATA_R |= 0b00010000;
 	else
 		GPIO_PORTF_DATA_R &= 0b11101111;
@@ -152,15 +151,19 @@ void BlinkLED3(void){
 void GoHome(void){
 	MotorRunning = 0;
 	stepCount = 0;
-	UpdateLEDs();
-
-	// simple home: keep rotating CCW until currentPosition = 0
-	while(currentPosition != 0){
+	if(clockWise == 1)
 		clockWise = 0;
+  else
+		clockWise = 1;
+	UpdateLEDs();
+	
+	// simple home: keep rotating CCW until currentPosition = 0
+	while(currentPosition != homePosition){   //this is where home changes. if home has  to be the same then: while(currentPosition!=0)
 		UpdateLEDs();
 		FullStepMotor();
+		
 	}
-
+	Angle11 = 1;
 	MotorOff();
 
 	// all LEDs off
@@ -192,6 +195,7 @@ int main(void){
 		if(newB0 && !oldB0){ // check if the button has been pressed
 			if(MotorRunning == 1){ //if was running then now off
 				MotorRunning = 0;
+				homePosition=currentPosition; // if home doesnt need to change then remove this
 			}
 			else{
 				MotorRunning = 1;// vice versa
@@ -260,6 +264,7 @@ int main(void){
 			if(stepCount >= 2048){
 				MotorRunning = 0;
 				stepCount = 0;
+				homePosition=currentPosition; //save current stop position as new home. Remove if not needed 
 				MotorOff();
 				UpdateLEDs();
 			}
